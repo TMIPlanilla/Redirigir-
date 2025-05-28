@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario Factura TMI</title>
+  <title>Información de Factura</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
@@ -26,6 +26,8 @@
     h2 {
       text-align: center;
       margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: #333;
     }
     label {
       display: block;
@@ -60,7 +62,7 @@
       margin-top: 20px;
     }
     .logo {
-      width: 120px;
+      width: 180px;
       display: block;
       margin: 0 auto 16px;
     }
@@ -69,7 +71,7 @@
 <body>
   <div class="container">
     <img src="logo.png" alt="Logo TMI" class="logo" />
-    <h2>Formulario de Factura</h2>
+    <h2>Información de Factura</h2>
     <form id="facturaForm">
       <input type="hidden" name="id" id="facturaId" />
 
@@ -96,7 +98,7 @@
       <label for="observaciones">Observaciones:</label>
       <textarea id="observaciones" name="observaciones" rows="3"></textarea>
 
-      <button type="submit">Enviar</button>
+      <button type="submit">Cargar información</button>
       <div id="success"></div>
     </form>
   </div>
