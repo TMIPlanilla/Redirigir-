@@ -1,56 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Abrir Formulario de Factura</title>
+  <meta charset="UTF-8">
+  <title>Formulario de Factura</title>
   <style>
     body {
-      background-color: #f2f2f2;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      font-family: sans-serif;
+      background: #f4f4f4;
       text-align: center;
+      padding: 40px;
     }
-    .card {
-      background-color: white;
+
+    .contenedor {
+      background: white;
       padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
     }
-    button {
-      margin-top: 20px;
+
+    img.logo {
+      width: 180px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    a.boton {
+      display: inline-block;
+      padding: 12px 24px;
       background-color: royalblue;
       color: white;
-      border: none;
-      padding: 14px 28px;
+      text-decoration: none;
       font-size: 16px;
       border-radius: 8px;
-      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    a.boton:hover {
+      background-color: #004bb1;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Factura recibida</h2>
-    <p>Haz clic en el botón para abrir el formulario y completar la información.</p>
-    <button onclick="abrirFormulario()">Abrir Formulario</button>
+  <div class="contenedor">
+    <img src="https://i.imgur.com/Xlb7tMz.png" alt="Logo Tecnomédica" class="logo">
+    <h1>Redirección al formulario de factura</h1>
+    <p>
+      Por favor complete la información solicitada en el formulario de factura. Una vez finalizado, recibirá un correo de confirmación.<br><br>
+      Si necesita ajustar los datos ingresados, ese nuevo correo incluirá un botón para editar la factura.
+    </p>
+    <a class="boton" href="https://script.google.com/macros/s/AKfycbxXW7mIi2iiDDX0xL8IiAD1rLxKq9OYu9pOLSPb30x-2iKXeU6uyY9NUJKICuhtSZNH1A/exec?id={{ID_FACTURA}}" target="_blank">
+      Ir al formulario
+    </a>
   </div>
-
-  <script>
-    function abrirFormulario() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-      if (id) {
-        window.location.href = `https://script.google.com/macros/s/AKfycbxXW7mIi2iiDDX0xL8IiAD1rLxKq9OYu9pOLSPb30x-2iKXeU6uyY9NUJKICuhtSZNH1A/exec?id=${encodeURIComponent(id)}`;
-      } else {
-        alert("ID de factura no proporcionado.");
-      }
-    }
-  </script>
 </body>
 </html>
