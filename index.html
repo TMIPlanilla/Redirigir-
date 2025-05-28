@@ -1,19 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redireccionando...</title>
-    <script>
-      const id = new URLSearchParams(window.location.search).get("id");
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abrir Formulario de Factura</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .card {
+      background-color: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    button {
+      margin-top: 20px;
+      background-color: royalblue;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Factura recibida</h2>
+    <p>Haz clic en el botón para abrir el formulario y completar la información.</p>
+    <button onclick="abrirFormulario()">Abrir Formulario</button>
+  </div>
+
+  <script>
+    function abrirFormulario() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
       if (id) {
-        location.href = "https://script.google.com/macros/s/AKfycbxXW7mIi2iiDDX0xL8IiAD1rLxKq9OYu9pOLSPb30x-2iKXeU6uyY9NUJKICuhtSZNH1A/exec?id=" + encodeURIComponent(id);
+        window.location.href = `https://script.google.com/macros/s/AKfycbxXW7mIi2iiDDX0xL8IiAD1rLxKq9OYu9pOLSPb30x-2iKXeU6uyY9NUJKICuhtSZNH1A/exec?id=${encodeURIComponent(id)}`;
       } else {
-        document.body.innerHTML = "<h2>Falta el parámetro ID en la URL.</h2>";
+        alert("ID de factura no proporcionado.");
       }
-    </script>
-  </head>
-  <body>
-    <p>Redirigiendo al formulario…</p>
-  </body>
+    }
+  </script>
+</body>
 </html>
