@@ -22,6 +22,7 @@
       margin: 20px;
       max-width: 480px;
       width: 100%;
+      box-sizing: border-box;
     }
     h2 {
       text-align: center;
@@ -41,6 +42,7 @@
       border-radius: 10px;
       margin-top: 5px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
     button {
       background-color: #007aff;
@@ -76,13 +78,13 @@
       <input type="hidden" name="id" id="facturaId" />
 
       <label for="cliente">Cliente:</label>
-      <input type="text" id="cliente" name="cliente" required />
+      <select id="cliente" name="cliente" required></select>
 
       <label for="proyecto">ID del Proyecto:</label>
-      <input type="text" id="proyecto" name="proyecto" required />
+      <select id="proyecto" name="proyecto" required></select>
 
       <label for="descripcion">Descripción del Proyecto:</label>
-      <input type="text" id="descripcion" name="descripcion" required />
+      <select id="descripcion" name="descripcion" required></select>
 
       <label for="responsable">Responsable:</label>
       <input type="text" id="responsable" name="responsable" required />
@@ -108,16 +110,69 @@
     const id = params.get("id");
     if (id) document.getElementById("facturaId").value = id;
 
-    const proyecto = document.getElementById("proyecto");
-    const descripcion = document.getElementById("descripcion");
+    const clienteSel = document.getElementById("cliente");
+    const proyectoSel = document.getElementById("proyecto");
+    const descripcionSel = document.getElementById("descripcion");
 
-    proyecto.addEventListener("input", () => {
-      if (!descripcion.value) descripcion.value = "Descripción de " + proyecto.value;
-    });
+    let proyectosPorCliente = {};
 
-    descripcion.addEventListener("input", () => {
-      if (!proyecto.value) proyecto.value = "ID-" + descripcion.value.substring(0, 4);
-    });
+    async function cargarProyectos() {
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbz4fNE4v9aFKLh8UHadlBNdICkNwJ9hHkUXw0Q4ZRc7k0V8abVB3komLu1kKrXBaBcp/exec");
+        proyectosPorCliente = await res.json();
+
+        Object.keys(proyectosPorCliente).forEach(cliente => {
+          const option = document.createElement("option");
+          option.value = cliente;
+          option.textContent = cliente;
+          clienteSel.appendChild(option);
+        });
+
+        clienteSel.addEventListener("change", actualizarOpciones);
+        proyectoSel.addEventListener("change", sincronizarDesdeID);
+        descripcionSel.addEventListener("change", sincronizarDesdeDescripcion);
+      } catch (e) {
+        console.error("Error al cargar proyectos:", e);
+      }
+    }
+
+    function actualizarOpciones() {
+      const cliente = clienteSel.value;
+      const proyectos = proyectosPorCliente[cliente] || [];
+
+      proyectoSel.innerHTML = "<option value=''>Seleccione ID</option>";
+      descripcionSel.innerHTML = "<option value=''>Seleccione descripción</option>";
+
+      proyectos.forEach(p => {
+        const optID = document.createElement("option");
+        optID.value = p.id;
+        optID.textContent = p.id;
+        proyectoSel.appendChild(optID);
+
+        const optDesc = document.createElement("option");
+        optDesc.value = p.descripcion;
+        optDesc.textContent = p.descripcion;
+        descripcionSel.appendChild(optDesc);
+      });
+    }
+
+    function sincronizarDesdeID() {
+      const cliente = clienteSel.value;
+      const proyectos = proyectosPorCliente[cliente] || [];
+      const sel = proyectoSel.value;
+      const match = proyectos.find(p => p.id === sel);
+      if (match) descripcionSel.value = match.descripcion;
+    }
+
+    function sincronizarDesdeDescripcion() {
+      const cliente = clienteSel.value;
+      const proyectos = proyectosPorCliente[cliente] || [];
+      const sel = descripcionSel.value;
+      const match = proyectos.find(p => p.descripcion === sel);
+      if (match) proyectoSel.value = match.id;
+    }
+
+    cargarProyectos();
 
     document.getElementById("facturaForm").addEventListener("submit", async (e) => {
       e.preventDefault();
