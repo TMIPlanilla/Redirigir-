@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redireccionando...</title>
+    <script>
+      const id = new URLSearchParams(window.location.search).get("id");
+      if (id) {
+        location.href = "https://script.google.com/macros/s/AKfycbxXW7mIi2iiDDX0xL8IiAD1rLxKq9OYu9pOLSPb30x-2iKXeU6uyY9NUJKICuhtSZNH1A/exec?id=" + encodeURIComponent(id);
+      } else {
+        document.body.innerHTML = "<h2>Falta el parámetro ID en la URL.</h2>";
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirigiendo al formulario…</p>
+  </body>
+</html>
