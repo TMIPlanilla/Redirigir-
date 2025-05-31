@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Factura ya completada</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .logo {
+      width: 180px;
+      display: block;
+      margin: 0 auto 16px;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    ul {
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      margin: 8px 0;
+      color: #444;
+    }
+    .boton-verde {
+      display: inline-block;
+      background-color: #28a745;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Logo TMI" class="logo" />
+    <h2>Información registrada de la factura</h2>
+    <div id="contenido"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) {
+      document.getElementById("contenido").innerHTML = "<p>Error: ID no proporcionado.</p>";
+    } else {
+      fetch(`https://script.google.com/macros/s/AKfycbw50A1maZG0VkKxrlnDmfjPxAbNOkXLVu3fdecZnJZD3uz8WvTzUfyvhY_kfI8I8qkkAw/exec?id=${id}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
+          } else if (!data.completo) {
+            window.location.href = `https://facturastmi.netlify.app/?id=${id}`;
+          } else {
+            document.getElementById("contenido").innerHTML = `
+              <ul>
+                <li><b>Cliente:</b> ${data.cliente}</li>
+                <li><b>Proyecto:</b> ${data.proyecto}</li>
+                <li><b>Responsable:</b> ${data.responsable}</li>
+                <li><b>Estado de pago:</b> ${data.estado}</li>
+                <li><b>Observaciones:</b> ${data.observaciones || "-"}</li>
+                <li><b>Enlace PDF:</b> <a href="${data.pdf}" target="_blank">Ver factura</a></li>
+              </ul>
+              <a href="https://facturastmi.netlify.app/?id=${id}" class="boton-verde">Editar factura</a>
+            `;
+          }
+        })
+        .catch(err => {
+          document.getElementById("contenido").innerHTML = `<p>Error de conexión: ${err.message}</p>`;
+        });
+    }
+  </script>
+</body>
+</html>
