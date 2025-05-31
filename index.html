@@ -118,7 +118,7 @@
 
     async function cargarProyectos() {
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbyAICvOz1-2fqqIIsfcAaXe1OEL0O1_0BUHp_gDa6cupBJuzt58Xa4WUHbuWHk3ZOTA/exec");
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyZKVdWXSX3pKSTB8pl_fwMuHiaK6NOsPMExE3sWln7ApxWlRx0KkFA-iRakPWb4Dq3/exec");
         proyectosPorCliente = await res.json();
 
         Object.keys(proyectosPorCliente).forEach(cliente => {
