@@ -179,7 +179,7 @@
       const data = Object.fromEntries(new FormData(e.target));
 
       try {
-        await fetch("https://script.google.com/macros/s/AKfycbzHk9jDKZdcBfz3Cyt-KVG2dHVLBF9g1CPEg6QsKImyBQeKhi_Favw8Ggz-60ZS3Ks9MA/exec", {
+        await fetch(await fetch("https://script.google.com/macros/s/AKfycbwcK-XaVNOhEG1wSQ-2N8yjRz_EBTlftuex1V78z44FeUXPBrstbnCwXDU2WiFCmpIisA/exec", { {
           method: "POST",
           mode: "no-cors",
           headers: {
