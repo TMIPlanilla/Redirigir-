@@ -69,7 +69,7 @@
     if (!id) {
       document.getElementById("contenido").innerHTML = "<p>Error: ID no proporcionado.</p>";
     } else {
-      fetch(`https://script.google.com/macros/s/AKfycbw50A1maZG0VkKxrlnDmfjPxAbNOkXLVu3fdecZnJZD3uz8WvTzUfyvhY_kfI8I8qkkAw/exec?id=${id}`)
+      fetch(`https://script.google.com/macros/s/AKfycbyZKVdWXSX3pKSTB8pl_fwMuHiaK6NOsPMExE3sWln7ApxWlRx0KkFA-iRakPWb4Dq3/exec?id=${id}`)
         .then(r => r.json())
         .then(data => {
           if (data.error) {
