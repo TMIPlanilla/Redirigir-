@@ -53,6 +53,15 @@
       font-size: 1rem;
       margin-top: 20px;
     }
+    pre {
+      font-size: 0.85rem;
+      background: #eee;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      color: #555;
+      overflow-x: auto;
+    }
   </style>
 </head>
 <body>
@@ -66,17 +75,29 @@
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
+    const log = (msg) => {
+      const d = document.createElement("pre");
+      d.textContent = msg;
+      document.getElementById("contenido").appendChild(d);
+    };
+
     if (!id) {
       document.getElementById("contenido").innerHTML = "<p>Error: ID no proporcionado.</p>";
     } else {
+      log("🔍 Consultando ID: " + id);
+
       fetch(`https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec?id=${id}`)
         .then(r => r.json())
         .then(data => {
+          log("📦 Respuesta JSON: " + JSON.stringify(data));
+
           if (data.error) {
             document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
           } else if (!data.completo) {
+            log("➡️ Redirigiendo al formulario...");
             window.location.href = `https://facturastmi.netlify.app/?id=${id}`;
           } else {
+            log("✅ Datos completos. Mostrando información.");
             document.getElementById("contenido").innerHTML = `
               <ul>
                 <li><b>Cliente:</b> ${data.cliente}</li>
@@ -91,6 +112,7 @@
           }
         })
         .catch(err => {
+          log("❌ Error de conexión: " + err.message);
           document.getElementById("contenido").innerHTML = `<p>Error de conexión: ${err.message}</p>`;
         });
     }
