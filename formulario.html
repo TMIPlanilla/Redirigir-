@@ -63,6 +63,11 @@
       color: green;
       margin-top: 20px;
     }
+    #error {
+      text-align: center;
+      color: red;
+      margin-top: 20px;
+    }
     .logo {
       width: 180px;
       display: block;
@@ -102,6 +107,7 @@
 
       <button type="submit">Cargar información</button>
       <div id="success"></div>
+      <div id="error"></div>
     </form>
   </div>
 
@@ -118,7 +124,7 @@
 
     async function cargarProyectos() {
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbyZKVdWXSX3pKSTB8pl_fwMuHiaK6NOsPMExE3sWln7ApxWlRx0KkFA-iRakPWb4Dq3/exec");
+        const res = await fetch("https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec?tipo=proyectos");
         proyectosPorCliente = await res.json();
 
         Object.keys(proyectosPorCliente).forEach(cliente => {
@@ -133,6 +139,7 @@
         descripcionSel.addEventListener("change", sincronizarDesdeDescripcion);
       } catch (e) {
         console.error("Error al cargar proyectos:", e);
+        document.getElementById("error").innerText = "Error al cargar lista de proyectos.";
       }
     }
 
@@ -179,18 +186,25 @@
       const data = Object.fromEntries(new FormData(e.target));
 
       try {
-        await fetch("https://script.google.com/macros/s/AKfycbwNe243u3pqAp_ygNhSJ7C8p-IUE0FV1KVdMEzhnSP-OMryLOBDOwEWs2WFG-qDoJpBxg/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec", {
           method: "POST",
-          mode: "no-cors",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
         });
-        document.getElementById("success").innerText = "Información enviada correctamente. Puede cerrar esta ventana.";
-        e.target.reset();
+
+        const resText = await response.text();
+        if (resText.includes("OK")) {
+          document.getElementById("success").innerText = "Información enviada correctamente.";
+          document.getElementById("error").innerText = "";
+          e.target.reset();
+        } else {
+          throw new Error(resText);
+        }
       } catch (error) {
-        document.getElementById("success").innerText = "Error al enviar. Intente de nuevo.";
+        document.getElementById("error").innerText = "Error al enviar: " + error.message;
+        document.getElementById("success").innerText = "";
       }
     });
   </script>
