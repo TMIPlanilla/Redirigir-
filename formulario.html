@@ -3,77 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Información de Factura</title>
+  <title>Formulario de Factura</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-      background-color: #f4f4f4;
-      margin: 0; padding: 0;
-      display: flex; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .container {
       background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       padding: 24px;
-      margin: 30px;
-      max-width: 480px;
+      border-radius: 16px;
+      max-width: 500px;
       width: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       box-sizing: border-box;
-    }
-    h2, label {
-      color: #333;
     }
     label {
       display: block;
-      margin-top: 10px;
-      font-weight: 500;
+      margin-top: 12px;
+      font-weight: bold;
     }
-    input, select, textarea, button {
+    input, select, textarea {
       width: 100%;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 10px;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 8px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
     button {
-      background-color: #007aff;
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background-color: #28a745;
       color: white;
       border: none;
+      border-radius: 12px;
+      font-size: 1rem;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #005fcc;
-    }
-    #success {
-      text-align: center;
+    .cancelar {
+      background-color: #6c757d;
       margin-top: 10px;
-      color: green;
+    }
+    .mensaje {
+      margin-top: 16px;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Información de Factura</h2>
-    <form id="facturaForm">
-      <input type="hidden" name="id" id="facturaId" />
+    <h2>Completar información de factura</h2>
+    <form id="formulario">
+      <input type="hidden" id="id" name="id">
+      <label for="cliente">Cliente</label>
+      <input type="text" id="cliente" name="cliente" required />
 
-      <label for="cliente">Cliente:</label>
-      <select id="cliente" name="cliente" required></select>
+      <label for="proyecto">Proyecto</label>
+      <input type="text" id="proyecto" name="proyecto" required />
 
-      <label for="proyecto">ID del Proyecto:</label>
-      <select id="proyecto" name="proyecto" required></select>
-
-      <label for="descripcion">Descripción del Proyecto:</label>
-      <select id="descripcion" name="descripcion" required></select>
-
-      <label for="responsable">Responsable:</label>
+      <label for="responsable">Responsable</label>
       <input type="text" id="responsable" name="responsable" required />
 
-      <label for="estado">Estado de pago:</label>
+      <label for="estado">Estado de pago</label>
       <select id="estado" name="estado" required>
         <option value="">Seleccione</option>
         <option value="Sí">Sí</option>
@@ -81,108 +80,46 @@
         <option value="No lo sé">No lo sé</option>
       </select>
 
-      <label for="observaciones">Observaciones:</label>
+      <label for="observaciones">Observaciones</label>
       <textarea id="observaciones" name="observaciones" rows="3"></textarea>
 
       <button type="submit">Guardar</button>
-      <div id="success"></div>
+      <button type="button" class="cancelar" onclick="window.close()">Cerrar</button>
+
+      <div id="mensaje" class="mensaje"></div>
     </form>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
-    const API_BASE = "https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec";
+    document.getElementById("id").value = id;
 
-    if (id) {
-      document.getElementById("facturaId").value = id;
-      console.log("ID cargado:", id);
-    } else {
-      document.getElementById("success").innerText = "Error: ID no proporcionado.";
-      console.warn("Falta el parámetro ID");
-    }
-
-    const clienteSel = document.getElementById("cliente");
-    const proyectoSel = document.getElementById("proyecto");
-    const descripcionSel = document.getElementById("descripcion");
-    let proyectosPorCliente = {};
-
-    async function cargarProyectos() {
-      try {
-        const res = await fetch(`${API_BASE}?tipo=proyectos`);
-        proyectosPorCliente = await res.json();
-        console.log("Proyectos cargados:", proyectosPorCliente);
-
-        Object.keys(proyectosPorCliente).forEach(cliente => {
-          const opt = document.createElement("option");
-          opt.value = cliente;
-          opt.textContent = cliente;
-          clienteSel.appendChild(opt);
-        });
-
-        clienteSel.addEventListener("change", actualizarOpciones);
-        proyectoSel.addEventListener("change", sincronizarDesdeID);
-        descripcionSel.addEventListener("change", sincronizarDesdeDescripcion);
-      } catch (err) {
-        console.error("Error al cargar proyectos:", err);
-      }
-    }
-
-    function actualizarOpciones() {
-      const cliente = clienteSel.value;
-      const proyectos = proyectosPorCliente[cliente] || [];
-      proyectoSel.innerHTML = "<option value=''>Seleccione ID</option>";
-      descripcionSel.innerHTML = "<option value=''>Seleccione descripción</option>";
-
-      proyectos.forEach(p => {
-        let optID = new Option(p.id, p.id);
-        let optDesc = new Option(p.descripcion, p.descripcion);
-        proyectoSel.appendChild(optID);
-        descripcionSel.appendChild(optDesc);
-      });
-    }
-
-    function sincronizarDesdeID() {
-      const cliente = clienteSel.value;
-      const proyectos = proyectosPorCliente[cliente] || [];
-      const sel = proyectoSel.value;
-      const match = proyectos.find(p => p.id === sel);
-      if (match) descripcionSel.value = match.descripcion;
-    }
-
-    function sincronizarDesdeDescripcion() {
-      const cliente = clienteSel.value;
-      const proyectos = proyectosPorCliente[cliente] || [];
-      const sel = descripcionSel.value;
-      const match = proyectos.find(p => p.descripcion === sel);
-      if (match) proyectoSel.value = match.id;
-    }
-
-    cargarProyectos();
-
-    document.getElementById("facturaForm").addEventListener("submit", async (e) => {
+    document.getElementById("formulario").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-      console.log("Datos enviados:", data);
+
+      const datos = {
+        id,
+        cliente: document.getElementById("cliente").value,
+        proyecto: document.getElementById("proyecto").value,
+        responsable: document.getElementById("responsable").value,
+        estado: document.getElementById("estado").value,
+        observaciones: document.getElementById("observaciones").value
+      };
 
       try {
-        const response = await fetch(API_BASE, {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
+          body: JSON.stringify(datos)
         });
-
-        const txt = await response.text();
-        console.log("Respuesta del servidor:", txt);
-
-        if (txt.startsWith("OK")) {
-          document.getElementById("success").innerText = "Información guardada correctamente.";
+        const texto = await res.text();
+        if (texto.includes("OK")) {
+          document.getElementById("mensaje").textContent = "✅ Información guardada correctamente.";
         } else {
-          document.getElementById("success").innerText = "Error: " + txt;
+          document.getElementById("mensaje").textContent = "❌ Error al guardar los datos.";
         }
-      } catch (err) {
-        console.error("Error al enviar:", err);
-        document.getElementById("success").innerText = "Error al guardar los datos.";
+      } catch (error) {
+        document.getElementById("mensaje").textContent = "❌ Error de conexión: " + error.message;
       }
     });
   </script>
