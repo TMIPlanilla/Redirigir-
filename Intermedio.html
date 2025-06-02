@@ -53,6 +53,15 @@
       font-size: 1rem;
       margin-top: 20px;
     }
+    .boton-cerrar {
+      margin-top: 20px;
+      background-color: #888;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+    }
     pre {
       font-size: 0.85rem;
       background: #eee;
@@ -69,11 +78,13 @@
     <img src="logo.png" alt="Logo TMI" class="logo" />
     <h2>Información registrada de la factura</h2>
     <div id="contenido"></div>
+    <button class="boton-cerrar" onclick="window.close()">Cerrar ventana</button>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
+    const api = "https://script.google.com/macros/s/AKfycbz5Rv-iQnoNjDa5yo_R1SyrYKzknUmuc8stKB3MRT76gIMF-vfPxd8kTD9p9Sbn-EO7/exec";
 
     const log = (msg) => {
       const d = document.createElement("pre");
@@ -86,7 +97,7 @@
     } else {
       log("🔍 Consultando ID: " + id);
 
-      fetch(`https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec?id=${id}`)
+      fetch(`${api}?id=${id}`)
         .then(r => r.json())
         .then(data => {
           log("📦 Respuesta JSON: " + JSON.stringify(data));
