@@ -18,7 +18,7 @@
       background: white;
       padding: 24px;
       border-radius: 16px;
-      max-width: 500px;
+      max-width: 540px;
       width: 100%;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       box-sizing: border-box;
@@ -32,18 +32,20 @@
       display: block;
       margin-top: 12px;
       font-weight: bold;
+      font-size: 1rem;
     }
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 4px;
+      padding: 12px;
+      margin-top: 6px;
+      font-size: 1rem;
       border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
     button {
       margin-top: 20px;
-      padding: 12px;
+      padding: 14px;
       width: 100%;
       background-color: #28a745;
       color: white;
@@ -54,12 +56,13 @@
     }
     .cancelar {
       background-color: #6c757d;
-      margin-top: 10px;
     }
     .mensaje {
       margin-top: 16px;
       font-weight: bold;
       text-align: center;
+      font-size: 0.95rem;
+      color: #333;
     }
   </style>
 </head>
@@ -94,7 +97,7 @@
       <textarea id="observaciones" name="observaciones" rows="3"></textarea>
 
       <button type="submit">Guardar</button>
-      <button type="button" class="cancelar" onclick="cerrarVentana()">Cerrar</button>
+      <button type="button" class="cancelar" id="cerrarBtn">Cerrar</button>
 
       <div id="mensaje" class="mensaje"></div>
     </form>
@@ -123,7 +126,6 @@
           document.getElementById("responsable").value = data.responsable || "";
           document.getElementById("estado").value = data.estado || "";
           document.getElementById("observaciones").value = data.observaciones || "";
-
           await cargarProyectos(data.cliente, data.proyecto);
         }
       } catch (err) {
@@ -195,7 +197,6 @@
 
     document.getElementById("formulario").addEventListener("submit", async function (e) {
       e.preventDefault();
-
       const datos = {
         id,
         cliente: clienteSelect.value,
@@ -213,7 +214,6 @@
         const texto = await res.text();
         if (texto.includes("OK")) {
           document.getElementById("mensaje").textContent = "✅ Información guardada correctamente.";
-          setTimeout(() => cerrarVentana(), 1000);
         } else {
           document.getElementById("mensaje").textContent = "❌ Error al guardar los datos.";
         }
@@ -222,13 +222,12 @@
       }
     });
 
-    function cerrarVentana() {
-      try {
-        window.close();
-      } catch (err) {
-        alert("Formulario enviado. Puede cerrar esta ventana manualmente.");
-      }
-    }
+    document.getElementById("cerrarBtn").addEventListener("click", () => {
+      window.close();
+      setTimeout(() => {
+        document.getElementById("mensaje").textContent = "🔒 Esta ventana no puede cerrarse automáticamente. Puede cerrarla manualmente.";
+      }, 500);
+    });
 
     cargarDatosFactura();
   </script>
