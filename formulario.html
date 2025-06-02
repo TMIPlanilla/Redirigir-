@@ -94,7 +94,7 @@
       <textarea id="observaciones" name="observaciones" rows="3"></textarea>
 
       <button type="submit">Guardar</button>
-      <button type="button" class="cancelar" onclick="window.close()">Cerrar</button>
+      <button type="button" class="cancelar" onclick="cerrarVentana()">Cerrar</button>
 
       <div id="mensaje" class="mensaje"></div>
     </form>
@@ -213,6 +213,7 @@
         const texto = await res.text();
         if (texto.includes("OK")) {
           document.getElementById("mensaje").textContent = "✅ Información guardada correctamente.";
+          setTimeout(() => cerrarVentana(), 1000);
         } else {
           document.getElementById("mensaje").textContent = "❌ Error al guardar los datos.";
         }
@@ -220,6 +221,14 @@
         document.getElementById("mensaje").textContent = "❌ Error de conexión: " + error.message;
       }
     });
+
+    function cerrarVentana() {
+      try {
+        window.close();
+      } catch (err) {
+        alert("Formulario enviado. Puede cerrar esta ventana manualmente.");
+      }
+    }
 
     cargarDatosFactura();
   </script>
