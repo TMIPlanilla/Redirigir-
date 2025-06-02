@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario de Factura</title>
+  <title>Formulario de factura</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
-      background: #f4f4f4;
+      font-family: system-ui, sans-serif;
+      background: #f9f9f9;
       margin: 0;
       padding: 20px;
       display: flex;
@@ -18,19 +18,17 @@
       background: white;
       padding: 24px;
       border-radius: 16px;
-      max-width: 500px;
       width: 100%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      box-sizing: border-box;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     label {
       display: block;
       margin-top: 12px;
-      font-weight: bold;
     }
-    input, select, textarea {
+    select, input, textarea {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 4px;
       border-radius: 8px;
       border: 1px solid #ccc;
@@ -40,39 +38,43 @@
       margin-top: 20px;
       padding: 12px;
       width: 100%;
-      background-color: #28a745;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 12px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .cancelar {
-      background-color: #6c757d;
-      margin-top: 10px;
+      font-weight: bold;
     }
     .mensaje {
       margin-top: 16px;
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
+    }
+    .boton-cerrar {
+      margin-top: 12px;
+      background-color: #666;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Completar información de factura</h2>
+    <h2>Asignar información a la factura</h2>
     <form id="formulario">
-      <input type="hidden" id="id" name="id">
-      <label for="cliente">Cliente</label>
+      <input type="hidden" id="id" name="id" />
+      <label>Cliente</label>
       <input type="text" id="cliente" name="cliente" required />
 
-      <label for="proyecto">Proyecto</label>
+      <label>Proyecto</label>
       <input type="text" id="proyecto" name="proyecto" required />
 
-      <label for="responsable">Responsable</label>
+      <label>Responsable</label>
       <input type="text" id="responsable" name="responsable" required />
 
-      <label for="estado">Estado de pago</label>
+      <label>Estado de pago</label>
       <select id="estado" name="estado" required>
         <option value="">Seleccione</option>
         <option value="Sí">Sí</option>
@@ -80,48 +82,41 @@
         <option value="No lo sé">No lo sé</option>
       </select>
 
-      <label for="observaciones">Observaciones</label>
-      <textarea id="observaciones" name="observaciones" rows="3"></textarea>
+      <label>Observaciones</label>
+      <textarea id="observaciones" name="observaciones"></textarea>
 
-      <button type="submit">Guardar</button>
-      <button type="button" class="cancelar" onclick="window.close()">Cerrar</button>
-
-      <div id="mensaje" class="mensaje"></div>
+      <button type="submit">Guardar datos</button>
+      <button type="button" class="boton-cerrar" onclick="window.close()">Cerrar ventana</button>
     </form>
+    <div id="mensaje" class="mensaje"></div>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    const id = new URLSearchParams(window.location.search).get("id");
     document.getElementById("id").value = id;
 
-    document.getElementById("formulario").addEventListener("submit", async function (e) {
+    document.getElementById("formulario").addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const datos = {
-        id,
-        cliente: document.getElementById("cliente").value,
-        proyecto: document.getElementById("proyecto").value,
-        responsable: document.getElementById("responsable").value,
-        estado: document.getElementById("estado").value,
-        observaciones: document.getElementById("observaciones").value
-      };
+      const data = Object.fromEntries(new FormData(e.target));
+      document.getElementById("mensaje").textContent = "Enviando...";
 
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbwN5nX29MpXnZTY0o7_2KHqUezV88aPWe-vexB-_IkU_UiMCY4PmBGLuzrWBwI7fRs/exec", {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbz5Rv-iQnoNjDa5yo_R1SyrYKzknUmuc8stKB3MRT76gIMF-vfPxd8kTD9p9Sbn-EO7/exec", {
           method: "POST",
-          body: JSON.stringify(datos)
+          body: JSON.stringify(data)
         });
-        const texto = await res.text();
-        if (texto.includes("OK")) {
-          document.getElementById("mensaje").textContent = "✅ Información guardada correctamente.";
+        const text = await res.text();
+
+        if (text.trim() === "OK") {
+          document.getElementById("mensaje").textContent = "✅ Datos guardados correctamente.";
         } else {
-          document.getElementById("mensaje").textContent = "❌ Error al guardar los datos.";
+          document.getElementById("mensaje").textContent = "❌ Error: " + text;
         }
-      } catch (error) {
-        document.getElementById("mensaje").textContent = "❌ Error de conexión: " + error.message;
+      } catch (err) {
+        document.getElementById("mensaje").textContent = "❌ Error de conexión: " + err.message;
       }
     });
   </script>
 </body>
 </html>
+
