@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario de factura</title>
+  <title>Formulario de Factura</title>
   <style>
     body {
-      font-family: system-ui, sans-serif;
-      background: #f9f9f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+      background: #f4f4f4;
       margin: 0;
       padding: 20px;
       display: flex;
@@ -18,19 +18,26 @@
       background: white;
       padding: 24px;
       border-radius: 16px;
-      width: 100%;
       max-width: 500px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .logo {
+      width: 180px;
+      display: block;
+      margin: 0 auto 16px;
     }
     label {
       display: block;
       margin-top: 12px;
+      font-weight: bold;
     }
-    select, input, textarea {
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 4px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
@@ -38,43 +45,44 @@
       margin-top: 20px;
       padding: 12px;
       width: 100%;
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
       border: none;
       border-radius: 12px;
-      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .cancelar {
+      background-color: #6c757d;
+      margin-top: 10px;
     }
     .mensaje {
       margin-top: 16px;
-      text-align: center;
       font-weight: bold;
-    }
-    .boton-cerrar {
-      margin-top: 12px;
-      background-color: #666;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      border-radius: 8px;
-      border: none;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Asignar información a la factura</h2>
+    <img src="logo.png" class="logo" alt="Logo TMI" />
+    <h2>Completar información de factura</h2>
     <form id="formulario">
-      <input type="hidden" id="id" name="id" />
-      <label>Cliente</label>
-      <input type="text" id="cliente" name="cliente" required />
+      <input type="hidden" id="id" name="id">
 
-      <label>Proyecto</label>
-      <input type="text" id="proyecto" name="proyecto" required />
+      <label for="cliente">Cliente</label>
+      <select id="cliente" name="cliente" required></select>
 
-      <label>Responsable</label>
+      <label for="proyecto">ID Proyecto</label>
+      <select id="proyecto" name="proyecto" required></select>
+
+      <label for="descripcion">Descripción del Proyecto</label>
+      <select id="descripcion" name="descripcion" required></select>
+
+      <label for="responsable">Responsable</label>
       <input type="text" id="responsable" name="responsable" required />
 
-      <label>Estado de pago</label>
+      <label for="estado">Estado de pago</label>
       <select id="estado" name="estado" required>
         <option value="">Seleccione</option>
         <option value="Sí">Sí</option>
@@ -82,41 +90,138 @@
         <option value="No lo sé">No lo sé</option>
       </select>
 
-      <label>Observaciones</label>
-      <textarea id="observaciones" name="observaciones"></textarea>
+      <label for="observaciones">Observaciones</label>
+      <textarea id="observaciones" name="observaciones" rows="3"></textarea>
 
-      <button type="submit">Guardar datos</button>
-      <button type="button" class="boton-cerrar" onclick="window.close()">Cerrar ventana</button>
+      <button type="submit">Guardar</button>
+      <button type="button" class="cancelar" onclick="window.close()">Cerrar</button>
+
+      <div id="mensaje" class="mensaje"></div>
     </form>
-    <div id="mensaje" class="mensaje"></div>
   </div>
 
   <script>
-    const id = new URLSearchParams(window.location.search).get("id");
+    const API_URL = "https://script.google.com/macros/s/AKfycbz5Rv-iQnoNjDa5yo_R1SyrYKzknUmuc8stKB3MRT76gIMF-vfPxd8kTD9p9Sbn-EO7/exec";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
     document.getElementById("id").value = id;
 
-    document.getElementById("formulario").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-      document.getElementById("mensaje").textContent = "Enviando...";
+    const clienteSelect = document.getElementById("cliente");
+    const proyectoSelect = document.getElementById("proyecto");
+    const descripcionSelect = document.getElementById("descripcion");
 
+    let proyectosData = {};
+
+    async function cargarDatosFactura() {
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbz5Rv-iQnoNjDa5yo_R1SyrYKzknUmuc8stKB3MRT76gIMF-vfPxd8kTD9p9Sbn-EO7/exec", {
-          method: "POST",
-          body: JSON.stringify(data)
-        });
-        const text = await res.text();
+        const res = await fetch(`${API_URL}?id=${id}`);
+        const data = await res.json();
 
-        if (text.trim() === "OK") {
-          document.getElementById("mensaje").textContent = "✅ Datos guardados correctamente.";
+        if (data.error) {
+          document.getElementById("mensaje").textContent = "⚠ " + data.error;
         } else {
-          document.getElementById("mensaje").textContent = "❌ Error: " + text;
+          document.getElementById("responsable").value = data.responsable || "";
+          document.getElementById("estado").value = data.estado || "";
+          document.getElementById("observaciones").value = data.observaciones || "";
+
+          await cargarProyectos(data.cliente, data.proyecto);
         }
       } catch (err) {
-        document.getElementById("mensaje").textContent = "❌ Error de conexión: " + err.message;
+        document.getElementById("mensaje").textContent = "❌ Error al obtener datos.";
+      }
+    }
+
+    async function cargarProyectos(clienteActual, proyectoActual) {
+      const res = await fetch(`${API_URL}?tipo=proyectos`);
+      const data = await res.json();
+      proyectosData = data;
+
+      clienteSelect.innerHTML = '<option value="">Seleccione</option>';
+      Object.keys(data).forEach(cliente => {
+        const option = document.createElement("option");
+        option.value = cliente;
+        option.textContent = cliente;
+        if (cliente === clienteActual) option.selected = true;
+        clienteSelect.appendChild(option);
+      });
+
+      actualizarProyectoYDescripcion(clienteActual, proyectoActual);
+    }
+
+    function actualizarProyectoYDescripcion(cliente, proyectoActual) {
+      const opciones = proyectosData[cliente] || [];
+
+      proyectoSelect.innerHTML = '<option value="">Seleccione</option>';
+      descripcionSelect.innerHTML = '<option value="">Seleccione</option>';
+
+      opciones.forEach(p => {
+        const opt1 = document.createElement("option");
+        opt1.value = p.id;
+        opt1.textContent = p.id;
+        if (p.id === proyectoActual) opt1.selected = true;
+        proyectoSelect.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = p.descripcion;
+        opt2.textContent = p.descripcion;
+        if (p.id === proyectoActual) opt2.selected = true;
+        descripcionSelect.appendChild(opt2);
+      });
+    }
+
+    clienteSelect.addEventListener("change", () => {
+      actualizarProyectoYDescripcion(clienteSelect.value, "");
+    });
+
+    proyectoSelect.addEventListener("change", () => {
+      const cliente = clienteSelect.value;
+      const proyecto = proyectoSelect.value;
+      const opciones = proyectosData[cliente] || [];
+      const encontrado = opciones.find(p => p.id === proyecto);
+      if (encontrado) {
+        descripcionSelect.value = encontrado.descripcion;
       }
     });
+
+    descripcionSelect.addEventListener("change", () => {
+      const cliente = clienteSelect.value;
+      const descripcion = descripcionSelect.value;
+      const opciones = proyectosData[cliente] || [];
+      const encontrado = opciones.find(p => p.descripcion === descripcion);
+      if (encontrado) {
+        proyectoSelect.value = encontrado.id;
+      }
+    });
+
+    document.getElementById("formulario").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const datos = {
+        id,
+        cliente: clienteSelect.value,
+        proyecto: proyectoSelect.value,
+        responsable: document.getElementById("responsable").value,
+        estado: document.getElementById("estado").value,
+        observaciones: document.getElementById("observaciones").value
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(datos)
+        });
+        const texto = await res.text();
+        if (texto.includes("OK")) {
+          document.getElementById("mensaje").textContent = "✅ Información guardada correctamente.";
+        } else {
+          document.getElementById("mensaje").textContent = "❌ Error al guardar los datos.";
+        }
+      } catch (error) {
+        document.getElementById("mensaje").textContent = "❌ Error de conexión: " + error.message;
+      }
+    });
+
+    cargarDatosFactura();
   </script>
 </body>
 </html>
-
